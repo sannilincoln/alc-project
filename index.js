@@ -1,20 +1,33 @@
-var express = require('express');
-var studentController = require('./controller/studentController');
+const express = require('express');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 
 
-var app = express();
-//set up engine
-app.set('view engine', 'ejs');
-//set up stattic files
-app.use(express.static('./public'));
+//initialize express
+const app = express(); 
 
-//fire controller
-studentController(app);
+// connect to mongodb
+mongoose.connect('mongodb://localhost/studentdb');
+mongoose.Promise  = global.Promise;
 
 
-//dynamic rendering
+app.use(bodyParser.json());
+
+//initialize routes
+app.use('/api', require('./routes/api'));
+
+//error handling
+app.use(function(err, req, res, next){
+	res.status(422).send({error: err.message});
+});
 
 
 
-app.listen(3001);
+
+
+
+
+app.listen(process.env.port ||7000, function(){
+	console.log('server started');
+});
